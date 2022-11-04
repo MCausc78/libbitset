@@ -16,13 +16,36 @@ if ENV.has_key? "PREFIX"
 	prefix = ENV["PREFIX"]
 end
 
+project = {
+	:files => {
+		:src => [
+			"src/libbitset/bitset.c",
+			"src/libbitset/reader.c",
+			"src/libbitset/writer.c"
+		],
+		:include => [
+			"src/libbitset/bitset.h",
+			"src/libbitset/reader.h",
+			"src/libbitset/writer.h"
+		]
+	},
+	:output => "libbitset.so",
+	:cc => {
+		:args => [
+			"-fPIC",
+			"-shared",
+			"-Isrc"
+		]
+	}
+}
+
 case ARGV[0]
 when nil
 	usage
 	exit! 1
 when "build"
 	print `mkdir -p build/include build/lib`
-	print `gcc -fPIC -shared -Isrc -o build/lib/libbitset.so src/libbitset/bitset.c src/libbitset/reader.c src/libbitset/writer.c`
+	print `gcc #{project[:cc][:args].join ' '} -o build/lib/#{project[:output]} #{project[:files][:src].join ' '}`
 	print `cp -r src/. build/include/`
 	print `bash -c "shopt -s globstar; rm -f build/include/**/**/**/**.c"`
 when "clean"
@@ -30,7 +53,10 @@ when "clean"
 when "install"
 	print `cp -r build/. #{prefix}/`
 when "uninstall"
-	print `rm -rf #{prefix}/include/libbitset #{prefix}/lib/libbitset.so`
+	print `rm -rf #{
+project[:files][:include].each { |s|
+	prefix + "include" + s
+}.join ' '} #{prefix}/lib/#{project[:output]}`
 else
 	$stderr.puts "#{__FILE__}: unknown action: \"#{ARGV[0]}\""
 	exit! 2
