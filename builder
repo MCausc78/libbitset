@@ -34,7 +34,8 @@ project = {
 		:args => [
 			"-fPIC",
 			"-shared",
-			"-Isrc"
+			"-Isrc",
+			"-ldystring"
 		]
 	}
 }
