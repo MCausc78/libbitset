@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <libbitset/bitset.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -16,7 +17,7 @@ bool bitset_is_enabled(bitset_t *obj, byte_t bit) {
 	dword_t *part;
 	obj->_errno = 0;
 	if(bit < 64) {
-		ptr = (bit > 32 ? &(obj->part2) : &(obj->part1));
+		part = (bit > 32 ? &(obj->part2) : &(obj->part1));
 		return ((*part) & (1 << (bit % 32))) != 0;
 	} else {
 		obj->_errno = 1;
@@ -30,12 +31,12 @@ bitset_t *bitset_set_bit(bitset_t *obj, byte_t bit, bool value) {
 	obj->_errno = 0;
 	dword_t *part;
 	if(bit < 64) {
-		bit = ((bit > 32) ? &(obj->part2) : &(obj->part1));
+		part = ((bit > 32) ? &(obj->part2) : &(obj->part1));
 		dword_t rs = (1 << (bit % 32));
 		if(value)
-			*ptr |= rs;
+			*part |= rs;
 		else if(bitset_is_enabled(obj, bit))
-			*ptr &= ~rs;
+			*part &= ~rs;
 	} else {
 		obj->_errno = 1;
 	}
@@ -43,11 +44,14 @@ bitset_t *bitset_set_bit(bitset_t *obj, byte_t bit, bool value) {
 }
 
 qword_t bitset_pack(bitset_t *obj) {
-	if(!obj)
-			return obj;
+	errno = 0;
+	if(!obj) {
+			errno = EADDRNOTAVAIL;
+			return 0;
+	}
 	qword_t result = 0;
 	result |= (qword_t)obj->part1;
-	result |= (qword_t)(obj->part2 << 32);
+	result |= (((qword_t)obj->part2) << 32);
 	return result;
 }
 
@@ -64,7 +68,7 @@ byte_t bitset_length(bitset_t *obj) {
 	if(!obj)
 		return 0;
 	byte_t len;
-	qword_t part = bitset_pack(bs);
+	qword_t part = bitset_pack(obj);
 	for(len = 0; part != 0; part >>= 1)
 		len += (part & 1);
 	return len;

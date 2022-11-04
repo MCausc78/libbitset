@@ -22,7 +22,7 @@ when nil
 	exit! 1
 when "build"
 	print `mkdir -p build/include build/lib`
-	print `gcc -fPIC -shared -Isrc -o build/lib/libbitset.so src/bitset/bitset.c src/bitset/reader.c src/bitset/writer.c`
+	print `gcc -fPIC -shared -Isrc -o build/lib/libbitset.so src/libbitset/bitset.c src/libbitset/reader.c src/libbitset/writer.c`
 	print `cp -r src/. build/include/`
 	print `bash -c "shopt -s globstar; rm -f build/include/**/**/**/**.c"`
 when "clean"

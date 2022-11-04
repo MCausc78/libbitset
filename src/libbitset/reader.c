@@ -1,6 +1,6 @@
 #include <dystring/reader.h>
 #include <dystring/types.h>
-#inlcude <libbitset/bitset.h>
+#include <libbitset/bitset.h>
 #include <stdlib.h>
 
 bitset_t *dystring_reader_read_bitset(dystring_reader_t *obj) {

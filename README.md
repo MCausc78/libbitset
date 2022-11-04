@@ -35,10 +35,10 @@ int main(void) {
 	srand(time(0));
 	byte_t i;
 	for(i = 0; i < 8; i++) {
-		bitset_set_bit(bs, (rand() % 64), true)
+		bitset_set_bit(bs, (rand() % 64), true);
 	}
 	for(i = 0; i < 64; i++) {
-		printf("%d: %s", i, bitset_is_enabled(bs, i) ? "true" : "false");
+		printf("%d: %s\n", i, bitset_is_enabled(bs, i) ? "true" : "false");
 	}
 	bitset_destroy(bs);
 	return 0;
